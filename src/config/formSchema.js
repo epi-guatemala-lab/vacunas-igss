@@ -119,6 +119,16 @@ export const formFields = [
     conditional: { dependsOn: 'renglon', showWhen: 'OTRO' },
     colSpan: 'half',
   },
+  {
+    id: 'telefono',
+    label: 'Teléfono',
+    type: 'phone',
+    page: 1,
+    required: false,
+    placeholder: '0000 0000',
+    helpText: 'Número de teléfono para contacto',
+    colSpan: 'half',
+  },
 
   // ═══════════════════════════════════════════════════
   // PÁGINA 2: UBICACIÓN LABORAL
