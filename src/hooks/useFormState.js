@@ -46,26 +46,25 @@ export function useFormState(initialData = {}) {
 
   /**
    * Verifica si un registro con el mismo CUI ya fue enviado
-   * recientemente (últimas 24 horas).
+   * recientemente (últimos 7 días). Checks by CUI alone.
    */
-  const isDuplicate = useCallback((cui, timestamp) => {
+  const isDuplicate = useCallback((cui) => {
     try {
       const records = JSON.parse(localStorage.getItem(SUBMITTED_KEY) || '[]')
-      const key = `${cui}_${timestamp}`
-      // Limpiar registros mayores a 24 horas
-      const recent = records.filter(r => Date.now() - r.timestamp < 86400000)
+      // Limpiar registros mayores a 7 días
+      const sevenDays = 7 * 24 * 60 * 60 * 1000
+      const recent = records.filter(r => Date.now() - r.timestamp < sevenDays)
       localStorage.setItem(SUBMITTED_KEY, JSON.stringify(recent))
-      return recent.some(r => r.key === key)
+      return recent.some(r => r.key === cui)
     } catch {
       return false
     }
   }, [])
 
-  const markAsSubmitted = useCallback((cui, timestamp) => {
+  const markAsSubmitted = useCallback((cui) => {
     try {
       const records = JSON.parse(localStorage.getItem(SUBMITTED_KEY) || '[]')
-      const key = `${cui}_${timestamp}`
-      records.push({ key, timestamp: Date.now() })
+      records.push({ key: cui, timestamp: Date.now() })
       localStorage.setItem(SUBMITTED_KEY, JSON.stringify(records))
     } catch {
       // ignore

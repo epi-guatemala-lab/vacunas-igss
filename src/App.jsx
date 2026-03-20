@@ -6,16 +6,24 @@ import { retryPendingSubmissions, getPendingSubmissions } from './utils/sheetsAp
 
 export default function App() {
   const [isOnline, setIsOnline] = useState(navigator.onLine)
-  const pendingCount = getPendingSubmissions().length
+  const [pendingCount, setPendingCount] = useState(getPendingSubmissions().length)
 
   useEffect(() => {
-    const onOnline = () => setIsOnline(true)
+    const onOnline = async () => {
+      setIsOnline(true)
+      if (getPendingSubmissions().length > 0) {
+        await retryPendingSubmissions()
+        setPendingCount(getPendingSubmissions().length)
+      }
+    }
     const onOffline = () => setIsOnline(false)
     window.addEventListener('online', onOnline)
     window.addEventListener('offline', onOffline)
 
     if (navigator.onLine && getPendingSubmissions().length > 0) {
-      retryPendingSubmissions()
+      retryPendingSubmissions().then(() => {
+        setPendingCount(getPendingSubmissions().length)
+      })
     }
 
     return () => {

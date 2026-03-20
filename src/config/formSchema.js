@@ -170,7 +170,7 @@ export const formFields = [
     placeholder: '0000 00000 0000',
     helpText: 'Código Único de Identificación — 13 dígitos',
     colSpan: 'half',
-    validation: { minLength: 13, maxLength: 16 },
+    validation: { minLength: 13, maxLength: 16, pattern: '^[\\d\\s]{13,16}$', patternMessage: 'El CUI debe contener solo dígitos (13 dígitos)' },
   },
   {
     id: 'afiliacion',

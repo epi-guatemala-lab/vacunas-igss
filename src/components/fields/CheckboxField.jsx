@@ -3,10 +3,18 @@ export default function CheckboxField({ field, value, onChange, error }) {
   const selected = Array.isArray(value) ? value : value ? [value] : []
 
   const handleChange = (opt) => {
-    const newValue = selected.includes(opt)
-      ? selected.filter(v => v !== opt)
-      : [...selected, opt]
-    onChange(field.id, newValue)
+    if (opt === 'NINGUNA') {
+      // If NINGUNA is being selected, deselect everything else
+      const newValue = selected.includes('NINGUNA') ? [] : ['NINGUNA']
+      onChange(field.id, newValue)
+    } else {
+      // If any other option is selected, remove NINGUNA
+      const withoutNinguna = selected.filter(v => v !== 'NINGUNA')
+      const newValue = withoutNinguna.includes(opt)
+        ? withoutNinguna.filter(v => v !== opt)
+        : [...withoutNinguna, opt]
+      onChange(field.id, newValue)
+    }
   }
 
   return (

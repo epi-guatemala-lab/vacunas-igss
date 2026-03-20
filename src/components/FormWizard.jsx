@@ -87,13 +87,12 @@ export default function FormWizard() {
       return
     }
 
-    // Verificar duplicado por CUI + timestamp
+    // Verificar duplicado por CUI (ventana de 7 días)
     const cui = formData.cui || ''
-    const now = new Date().toISOString().slice(0, 10)
-    if (cui && isDuplicate(cui, now)) {
+    if (cui && isDuplicate(cui)) {
       setSubmitError(
-        `Ya se envió un registro para el CUI ${cui} el día de hoy. ` +
-        'Si necesita enviar otro registro, intente nuevamente mañana o contacte al administrador.'
+        `Ya se envió un registro para el CUI ${cui} en los últimos 7 días. ` +
+        'Si necesita enviar otro registro, contacte al administrador.'
       )
       return
     }
@@ -101,7 +100,7 @@ export default function FormWizard() {
     const result = await submit(formData)
     if (result?.success) {
       setRegistroId(result.registro_id)
-      markAsSubmitted(cui, now)
+      markAsSubmitted(cui)
       setShowSuccess(true)
     }
   }, [currentFields, formData, submit, isDuplicate, markAsSubmitted, setSubmitError])

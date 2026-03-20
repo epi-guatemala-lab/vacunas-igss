@@ -105,6 +105,7 @@ export function prepareSubmissionData(formData, fields) {
   // Agregar campos automáticos
   prepared.registro_id = generateRegistroId()
   prepared.timestamp_envio = getTimestamp()
+  prepared.usuario_dispositivo = navigator.userAgent || ''
 
   // Copiar y formatear datos del formulario
   // Solo incluir datos de campos que son visibles (excluir condicionales ocultos)
