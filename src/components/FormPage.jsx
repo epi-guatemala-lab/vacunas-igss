@@ -8,6 +8,14 @@ import TextAreaField from './fields/TextAreaField.jsx'
 import NumberField from './fields/NumberField.jsx'
 import PhoneField from './fields/PhoneField.jsx'
 import FileField from './fields/FileField.jsx'
+import { getDirecciones, getDepartamentos, getSecciones } from '../config/igssOrganizacion.js'
+
+// Dynamic option resolvers for cascading dropdowns
+const dynamicResolvers = {
+  getDirecciones: (formData) => getDirecciones(formData.subgerencia),
+  getDepartamentos: (formData) => getDepartamentos(formData.subgerencia, formData.direccion_igss),
+  getSecciones: (formData) => getSecciones(formData.subgerencia, formData.direccion_igss, formData.departamento_igss),
+}
 
 const fieldComponents = {
   text: TextField,
@@ -45,20 +53,30 @@ export default function FormPage({ fields, formData, onFieldChange, errors, page
           const FieldComponent = getFieldComponent(field)
           if (!FieldComponent) return null
 
-          const fieldErrors = errors[field.id] || []
+          // Resolve dynamic options for cascading dropdowns
+          let resolvedField = field
+          if (field.dynamicOptions && field.dynamicOptions.resolver) {
+            const resolver = dynamicResolvers[field.dynamicOptions.resolver]
+            if (resolver) {
+              const computedOptions = resolver(formData)
+              resolvedField = { ...field, options: computedOptions }
+            }
+          }
+
+          const fieldErrors = errors[resolvedField.id] || []
           const hasError = fieldErrors.length > 0
-          const isFullWidth = field.colSpan === 'full'
+          const isFullWidth = resolvedField.colSpan === 'full'
 
           // Section title
           let sectionEl = null
-          if (field.sectionTitle && field.sectionTitle !== currentSection) {
-            currentSection = field.sectionTitle
+          if (resolvedField.sectionTitle && resolvedField.sectionTitle !== currentSection) {
+            currentSection = resolvedField.sectionTitle
             sectionEl = (
               <div className="col-span-1 md:col-span-2 mt-4 mb-1">
                 <div className="flex items-center gap-2">
                   <div className="w-6 h-[2px] bg-igss-gold rounded-full" />
                   <h3 className="text-xs font-bold text-igss-brown uppercase tracking-[0.1em]">
-                    {field.sectionTitle}
+                    {resolvedField.sectionTitle}
                   </h3>
                   <div className="flex-1 h-[1px] bg-gray-200" />
                 </div>
@@ -68,29 +86,29 @@ export default function FormPage({ fields, formData, onFieldChange, errors, page
 
           return (
             <div
-              key={field.id}
+              key={resolvedField.id}
               className={`field-transition ${isFullWidth ? 'col-span-1 md:col-span-2' : ''}`}
             >
               {sectionEl}
               <label
-                htmlFor={field.id}
+                htmlFor={resolvedField.id}
                 className="block text-sm font-semibold text-gray-700 mb-2"
               >
-                {field.label}
-                {field.required && (
+                {resolvedField.label}
+                {resolvedField.required && (
                   <span className="text-igss-red ml-0.5 text-xs">*</span>
                 )}
               </label>
 
               <FieldComponent
-                field={field}
-                value={formData[field.id]}
+                field={resolvedField}
+                value={formData[resolvedField.id]}
                 onChange={onFieldChange}
                 error={hasError}
               />
 
-              {field.helpText && !hasError && (
-                <p className="mt-1.5 text-[11px] text-gray-400 leading-snug">{field.helpText}</p>
+              {resolvedField.helpText && !hasError && (
+                <p className="mt-1.5 text-[11px] text-gray-400 leading-snug">{resolvedField.helpText}</p>
               )}
 
               {hasError && (

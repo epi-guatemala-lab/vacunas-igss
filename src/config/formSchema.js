@@ -6,6 +6,8 @@
  * Las páginas corresponden a las secciones del censo.
  */
 
+import { getSubgerencias } from './igssOrganizacion.js'
+
 export const formTitle = 'Censo de Vacunación — Sarampión / SPR'
 export const formSubtitle = 'Departamento de Medicina Preventiva — Sección de Epidemiología'
 export const institutionName = 'Instituto Guatemalteco de Seguridad Social'
@@ -23,89 +25,6 @@ export const departamentosGuatemala = [
   'QUETZALTENANGO', 'QUICHÉ', 'RETALHULEU', 'SACATEPÉQUEZ',
   'SAN MARCOS', 'SANTA ROSA', 'SOLOLÁ', 'SUCHITEPÉQUEZ',
   'TOTONICAPÁN', 'ZACAPA',
-]
-
-// Subgerencias oficiales del IGSS (organigrama diciembre 2024)
-export const subgerencias = [
-  'SUBGERENCIA ADMINISTRATIVA',
-  'SUBGERENCIA FINANCIERA',
-  'SUBGERENCIA DE PRESTACIONES EN SALUD',
-  'SUBGERENCIA DE PRESTACIONES PECUNIARIAS',
-  'SUBGERENCIA DE RECURSOS HUMANOS',
-  'SUBGERENCIA DE TECNOLOGÍA',
-  'SUBGERENCIA DE PLANIFICACIÓN Y DESARROLLO',
-  'SUBGERENCIA DE INTEGRIDAD Y TRANSPARENCIA ADMINISTRATIVA',
-  'OTRA',
-]
-
-// Direcciones oficiales del IGSS
-export const direcciones = [
-  'DIRECCIÓN DE RECAUDACIÓN',
-  'DIRECCIÓN DE ANÁLISIS DE RIESGOS FINANCIEROS',
-  'DIRECCIÓN TERAPÉUTICA CENTRAL',
-  'DIRECCIÓN TÉCNICA DE LOGÍSTICA DE INSUMOS, MEDICAMENTOS Y EQUIPO MÉDICO',
-  'DIRECCIÓN DE COOPERACIÓN Y RELACIONES INTERNACIONALES (DICORI)',
-  'DIRECCIÓN DE INVESTIGACIÓN Y PROYECTOS TECNOLÓGICOS',
-  'DIRECCIÓN DE DESARROLLO Y GESTIÓN DE SISTEMAS',
-  'DIRECCIÓN DE TECNOLOGÍA Y SERVICIO',
-  'OTRA',
-]
-
-// Departamentos administrativos del IGSS
-export const departamentosIGSS = [
-  // Subgerencia Administrativa
-  'DEPARTAMENTO LEGAL',
-  'DEPARTAMENTO DE ABASTECIMIENTOS',
-  'DEPARTAMENTO DE SERVICIOS DE APOYO',
-  'DEPARTAMENTO DE SERVICIOS CONTRATADOS',
-  'DEPARTAMENTO DE COMUNICACIÓN SOCIAL Y RELACIONES PÚBLICAS',
-  // Subgerencia Financiera
-  'DEPARTAMENTO DE PRESUPUESTO',
-  'DEPARTAMENTO DE CONTABILIDAD',
-  'DEPARTAMENTO DE TESORERÍA',
-  'DEPARTAMENTO DE INVERSIONES',
-  'DEPARTAMENTO DE COBRO ADMINISTRATIVO',
-  'DEPARTAMENTO DE COBRO JUDICIAL',
-  'DEPARTAMENTO DE INSPECCIÓN PATRONAL',
-  'DEPARTAMENTO DE REGISTRO DE PATRONOS Y TRABAJADORES',
-  // Subgerencia Prestaciones en Salud
-  'DEPARTAMENTO MÉDICO DE SERVICIOS CENTRALES',
-  'DEPARTAMENTO MÉDICO DE SERVICIOS TÉCNICOS',
-  'DEPARTAMENTO DE MEDICINA PREVENTIVA',
-  // Subgerencia Prestaciones Pecuniarias
-  'DEPARTAMENTO DE PRESTACIONES EN DINERO',
-  'DEPARTAMENTO DE INVALIDEZ, VEJEZ Y SOBREVIVENCIA',
-  'DEPARTAMENTO DE MEDICINA LEGAL Y EVALUACIÓN DE INCAPACIDADES',
-  'DEPARTAMENTO DE TRABAJO SOCIAL',
-  'COORDINADORA DE DELEGACIONES Y CAJAS DEPARTAMENTALES',
-  // Subgerencia RRHH
-  'DEPARTAMENTO DE GESTIÓN Y PLANEACIÓN DEL RECURSO HUMANO',
-  'DEPARTAMENTO DE COMPENSACIONES Y BENEFICIOS',
-  'DEPARTAMENTO JURÍDICO-LABORAL',
-  'DEPARTAMENTO DE CAPACITACIÓN Y DESARROLLO',
-  // Subgerencia Tecnología
-  'DEPARTAMENTO DE GESTIÓN DE PROYECTOS TECNOLÓGICOS',
-  'DEPARTAMENTO DE RIESGO, INVESTIGACIÓN Y GESTIÓN DEL CAMBIO TECNOLÓGICO',
-  'DEPARTAMENTO DE ANÁLISIS Y DESARROLLO DE SISTEMAS',
-  'DEPARTAMENTO DE CONTROL DE CALIDAD',
-  'DEPARTAMENTO DE INFRAESTRUCTURA TECNOLÓGICA',
-  'DEPARTAMENTO DE TELECOMUNICACIONES, CONECTIVIDAD Y SEGURIDAD',
-  'DEPARTAMENTO DE SOPORTE TÉCNICO',
-  // Subgerencia Planificación y Desarrollo
-  'DEPARTAMENTO ACTUARIAL Y ESTADÍSTICO',
-  'DEPARTAMENTO DE INFRAESTRUCTURA INSTITUCIONAL',
-  'DEPARTAMENTO DE ORGANIZACIÓN Y MÉTODOS',
-  'DEPARTAMENTO DE PLANIFICACIÓN',
-  // Subgerencia Integridad
-  'DEPARTAMENTO DE INVESTIGACIONES ESPECIALES',
-  'DEPARTAMENTO DE CAMBIO INSTITUCIONAL',
-  'DEPARTAMENTO DE SUPERVISIÓN',
-  // Reportan a Gerencia
-  'DEPARTAMENTO DE AUDITORÍA INTERNA',
-  'DEPARTAMENTO DE AUDITORÍA DE SERVICIOS DE SALUD',
-  'CENTRO DE ATENCIÓN AL AFILIADO (CATAFI)',
-  'SECRETARÍA DE GERENCIA',
-  'OTRO',
 ]
 
 // Contraindicaciones para vacuna SRP/MMR (FDA + CDC/ACIP + WHO/PAHO)
@@ -229,7 +148,7 @@ export const formFields = [
     type: 'select',
     page: 2,
     required: true,
-    options: subgerencias,
+    options: getSubgerencias(),
     searchable: true,
     colSpan: 'full',
   },
@@ -249,10 +168,11 @@ export const formFields = [
     type: 'select',
     page: 2,
     required: false,
-    options: direcciones,
+    options: ['NO APLICA'],
     searchable: true,
-    helpText: 'Si aplica a su unidad organizativa',
+    helpText: 'Se actualiza según la subgerencia seleccionada',
     colSpan: 'full',
+    dynamicOptions: { dependsOn: 'subgerencia', resolver: 'getDirecciones' },
   },
   {
     id: 'direccion_igss_otra',
@@ -270,9 +190,11 @@ export const formFields = [
     type: 'select',
     page: 2,
     required: true,
-    options: departamentosIGSS,
+    options: ['OTRO'],
     searchable: true,
+    helpText: 'Se actualiza según la subgerencia y dirección seleccionadas',
     colSpan: 'full',
+    dynamicOptions: { dependsOn: ['subgerencia', 'direccion_igss'], resolver: 'getDepartamentos' },
   },
   {
     id: 'departamento_igss_otro',
@@ -287,10 +209,23 @@ export const formFields = [
   {
     id: 'seccion',
     label: 'Sección',
+    type: 'select',
+    page: 2,
+    required: false,
+    options: ['OTRA'],
+    searchable: true,
+    helpText: 'Se actualiza según el departamento seleccionado',
+    colSpan: 'half',
+    dynamicOptions: { dependsOn: ['subgerencia', 'direccion_igss', 'departamento_igss'], resolver: 'getSecciones' },
+  },
+  {
+    id: 'seccion_otra',
+    label: 'Especifique sección',
     type: 'text',
     page: 2,
     required: false,
-    placeholder: 'Sección donde labora',
+    placeholder: 'Nombre de la sección',
+    conditional: { dependsOn: 'seccion', showWhen: 'OTRA' },
     colSpan: 'half',
   },
 
@@ -324,7 +259,7 @@ export const formFields = [
     required: true,
     options: ['1', '2', '3', 'DESCONOCIDO'],
     helpText: 'Número de dosis de vacuna SPR o SR recibidas',
-    conditional: { dependsOn: 'vacunacion', showWhen: 'SI' },
+    conditional: { dependsOn: 'dispone_carnet', showWhen: 'SI' },
     colSpan: 'half',
   },
   {
@@ -334,7 +269,7 @@ export const formFields = [
     page: 3,
     required: false,
     helpText: 'Fecha aproximada de la última dosis aplicada',
-    conditional: { dependsOn: 'vacunacion', showWhen: 'SI' },
+    conditional: { dependsOn: 'dispone_carnet', showWhen: 'SI' },
     colSpan: 'half',
     validation: { noFuture: true },
   },

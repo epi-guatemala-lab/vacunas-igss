@@ -8,6 +8,7 @@ import { useConditionalFields } from '../hooks/useConditionalFields.js'
 import { useGoogleSheets } from '../hooks/useGoogleSheets.js'
 import { validatePage } from '../utils/validation.js'
 import { pageLabels, formFields } from '../config/formSchema.js'
+import { getDirecciones, getDepartamentos, getSecciones } from '../config/igssOrganizacion.js'
 
 export default function FormWizard() {
   const [currentStep, setCurrentStep] = useState(1)
@@ -45,6 +46,53 @@ export default function FormWizard() {
   const isLastStep = currentStep === totalSteps
 
   const handleFieldChange = useCallback((fieldId, value) => {
+    // Cascading organizational hierarchy: reset dependent fields
+    if (fieldId === 'subgerencia') {
+      updateMultipleFields({
+        [fieldId]: value,
+        direccion_igss: '',
+        departamento_igss: '',
+        seccion: '',
+      })
+      setErrors(prev => {
+        const next = { ...prev }
+        delete next[fieldId]
+        delete next['direccion_igss']
+        delete next['departamento_igss']
+        delete next['seccion']
+        return next
+      })
+      return
+    }
+    if (fieldId === 'direccion_igss') {
+      updateMultipleFields({
+        [fieldId]: value,
+        departamento_igss: '',
+        seccion: '',
+      })
+      setErrors(prev => {
+        const next = { ...prev }
+        delete next[fieldId]
+        delete next['departamento_igss']
+        delete next['seccion']
+        return next
+      })
+      return
+    }
+    if (fieldId === 'departamento_igss') {
+      updateMultipleFields({
+        [fieldId]: value,
+        seccion: '',
+      })
+      setErrors(prev => {
+        const next = { ...prev }
+        delete next[fieldId]
+        delete next['seccion']
+        return next
+      })
+      return
+    }
+
     updateField(fieldId, value)
 
     setErrors(prev => {
@@ -52,7 +100,7 @@ export default function FormWizard() {
       delete next[fieldId]
       return next
     })
-  }, [updateField])
+  }, [updateField, updateMultipleFields])
 
   const handleNext = useCallback(() => {
     const { isValid, errors: pageErrors } = validatePage(currentFields, formData)
