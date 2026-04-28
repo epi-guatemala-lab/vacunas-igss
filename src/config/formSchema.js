@@ -27,23 +27,24 @@ export const departamentosGuatemala = [
   'TOTONICAPÁN', 'ZACAPA',
 ]
 
-// Contraindicaciones para vacuna SRP/MMR (FDA + CDC/ACIP + WHO/PAHO)
+// Contraindicaciones para vacuna SRP/MMR (FDA + CDC/ACIP + WHO/PAHO).
+// Redactadas como preguntas claras para población general (no clínica).
 export const contraindicaciones = [
-  'CÁNCER / LEUCEMIA / LINFOMA',
-  'VIH / SIDA (CD4 <200)',
-  'INMUNOSUPRESIÓN CONGÉNITA O ADQUIRIDA',
-  'TUBERCULOSIS ACTIVA NO TRATADA',
-  'QUIMIOTERAPIA O RADIOTERAPIA ACTIVA',
-  'CORTICOSTEROIDES SISTÉMICOS (≥20mg/día ≥14 días)',
-  'TRASPLANTE DE ÓRGANO CON INMUNOSUPRESIÓN',
-  'DESNUTRICIÓN SEVERA',
-  'ALERGIA ANAFILÁCTICA A NEOMICINA O GELATINA',
-  'ALERGIA SEVERA AL HUEVO (ANAFILAXIA)',
-  'TROMBOCITOPENIA / PÚRPURA TROMBOCITOPÉNICA',
-  'FIEBRE >38.5°C ACTUAL',
-  'RECIBIÓ SANGRE O INMUNOGLOBULINAS EN ÚLTIMOS 3-11 MESES',
-  'RECIBIÓ OTRA VACUNA VIVA EN ÚLTIMOS 28 DÍAS',
-  'NINGUNA',
+  '¿Tiene cáncer, leucemia o linfoma?',
+  '¿Vive con VIH o SIDA con defensas muy bajas (CD4 menor a 200)?',
+  '¿Tiene defensas bajas por enfermedad o tratamiento (inmunosupresión)?',
+  '¿Tiene tuberculosis activa sin tratamiento?',
+  '¿Está recibiendo quimioterapia o radioterapia actualmente?',
+  '¿Toma esteroides en pastillas o inyectados (como prednisona o dexametasona) en dosis altas por más de 2 semanas seguidas?',
+  '¿Le hicieron un trasplante de órgano y toma medicamentos para evitar el rechazo?',
+  '¿Le han diagnosticado desnutrición severa?',
+  '¿Tiene alergia grave (anafilaxia) a neomicina o gelatina?',
+  '¿Tiene alergia grave (anafilaxia) al huevo?',
+  '¿Le han diagnosticado plaquetas bajas o púrpura trombocitopénica?',
+  '¿Tiene fiebre alta en este momento (mayor a 38.5 °C)?',
+  '¿Recibió transfusión de sangre o inmunoglobulinas en los últimos 3 a 11 meses?',
+  '¿Recibió alguna vacuna viva en los últimos 28 días? Vacunas vivas comunes: SPR/MMR, varicela, fiebre amarilla, rotavirus, polio oral (gotas), BCG, fiebre tifoidea oral.',
+  'Ninguna de las anteriores',
 ]
 
 export const formFields = [
@@ -285,7 +286,7 @@ export const formFields = [
   },
   {
     id: 'diagnostico_sarampion',
-    label: '¿Ha tenido diagnóstico de Sarampión?',
+    label: 'Ha sido diagnosticado con Sarampión',
     type: 'radio',
     page: 3,
     required: true,
@@ -314,12 +315,12 @@ export const formFields = [
   },
   {
     id: 'contraindicaciones',
-    label: 'Antecedente de Contraindicaciones para Vacuna SPR',
+    label: '¿Tiene alguno de estos antecedentes? Marque todas las que apliquen.',
     type: 'checkbox',
     page: 3,
     required: true,
     options: contraindicaciones,
-    helpText: 'Seleccione todas las que apliquen. Marque "Ninguna" si no tiene contraindicaciones.',
+    helpText: 'Si no tiene ninguna, marque "Ninguna de las anteriores".',
     colSpan: 'full',
   },
   {
